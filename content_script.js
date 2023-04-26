@@ -27,9 +27,17 @@ function speakHighlightedText(e) {
   e.stopPropagation();
   const text = window.getSelection().toString();
   if (text.length > 0) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    speechSynthesis.speak(utterance);
+    chrome.storage.sync.get('selectedVoice', (data) => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      if (data.selectedVoice) {
+        const selectedVoice = speechSynthesis.getVoices().find((voice) => voice.name === data.selectedVoice);
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+        }
+      }
+      speechSynthesis.speak(utterance);
+    });
   }
   hideSpeakerIcon();
 }
