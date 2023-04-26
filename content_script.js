@@ -28,19 +28,38 @@ function speakHighlightedText(e) {
   const text = window.getSelection().toString();
   if (text.length > 0) {
     chrome.runtime.sendMessage({ type: 'getSelectedVoice' }, (response) => {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      if (response.selectedVoiceName) {
-        const selectedVoice = speechSynthesis.getVoices().find((voice) => voice.name === response.selectedVoiceName);
-        if (selectedVoice) {
-          utterance.voice = selectedVoice;
-        }
-      }
-      speechSynthesis.speak(utterance);
+      const voiceName = response.selectedVoiceName;
+      const formData = new FormData();
+      formData.append('text', text);
+      formData.append('voice', voiceName);
+
+      const requestOptions = {
+        method: 'POST',
+        mode: 'cors',
+        body: formData,
+        
+      };
+
+      
+      
+      console.log("Sending request:", requestOptions); 
+      fetch('https://e506-35-247-169-249.ngrok.io/synthesize', requestOptions)
+        .then((response) => {
+            console.log("Received response:", response);
+            return response.blob();
+        })
+        .then((data) => {
+          const audio = new Audio(URL.createObjectURL(data));
+          audio.play();
+        })
+        .catch((error) => {
+            console.error('Error fetching synthesized speech:', error);
+        });
     });
   }
   hideSpeakerIcon();
 }
+
 
 
 
