@@ -1,16 +1,10 @@
 body {
-    width: 300px;
-    font-family: Arial, sans-serif;
-    text-align: center;
-  }
-  
-  textarea {
-    width: 90%;
-    height: 100px;
-    resize: none;
-  }
-  
-  button {
-    margin-top: 10px;
-  }
-  
+  width: 300px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+}

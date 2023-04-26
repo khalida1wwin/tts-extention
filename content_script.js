@@ -27,11 +27,11 @@ function speakHighlightedText(e) {
   e.stopPropagation();
   const text = window.getSelection().toString();
   if (text.length > 0) {
-    chrome.storage.sync.get('selectedVoice', (data) => {
+    chrome.runtime.sendMessage({ type: 'getSelectedVoice' }, (response) => {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
-      if (data.selectedVoice) {
-        const selectedVoice = speechSynthesis.getVoices().find((voice) => voice.name === data.selectedVoice);
+      if (response.selectedVoiceName) {
+        const selectedVoice = speechSynthesis.getVoices().find((voice) => voice.name === response.selectedVoiceName);
         if (selectedVoice) {
           utterance.voice = selectedVoice;
         }
@@ -41,6 +41,9 @@ function speakHighlightedText(e) {
   }
   hideSpeakerIcon();
 }
+
+
+
 
 document.addEventListener('mouseup', (e) => {
   const selectedText = window.getSelection().toString();
