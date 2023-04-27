@@ -14,6 +14,6 @@ To use on Google Chrome:
 3. Click "Load unpacked" and select the folder containing this extension (clone this repo) 
 4. tts extension should now appear in the list of extensions and in the toolbar (check the puzzle icon)
 
-# This should work on all browsers chromium browsers
+# This should work on all chromium browsers
 - tested on google chrome, brave 
 - for firefox try the firefox manifest.json after the deleting the old one
