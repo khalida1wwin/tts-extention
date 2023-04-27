@@ -30,5 +30,5 @@ Tips:
 - tested on google chrome, and Brave 
 - for firefox try the Firefox manifest.json after deleting the old one
 
-Thanks to suno-ai for their amazing model:
+3 Thanks to suno-ai for their amazing models:
 https://github.com/suno-ai/bark
