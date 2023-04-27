@@ -1,8 +1,9 @@
 # Disclaimer! 
 - This is an early version, and you might find few bugs!
 
-# tts-extention API
-Google colab (Bark_TTS_API.ipynb):
+# Installation 
+
+tts-extention API on Google colab (Bark_TTS_API.ipynb):
 1. run all the cells (make sure you use gpu)
 2. get the ngrok.io link (make sure it has s in https because sometimes it only gives http)
 3. paste the link in the extension fetch in content_script.js (there is a comment that will show you where)
@@ -19,7 +20,7 @@ To use the extension:
 2. Highlight the text you want 
 3. click on the speaker icon that shows up after you highlight the text
 
-tips:
+Tips:
 1. make sure to reload the extension when you edit its files
 2. force restart the pages you want to test after you install the extension 
 3. check the google colab if your text has been sent
