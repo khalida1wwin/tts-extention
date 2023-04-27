@@ -15,5 +15,5 @@ To use on Google Chrome:
 4. tts extension should now appear in the list of extensions and in the toolbar (check the puzzle icon)
 
 # This should work on all chromium browsers
-- tested on google chrome, brave 
+- tested on google chrome, and Brave 
 - for firefox try the firefox manifest.json after the deleting the old one
