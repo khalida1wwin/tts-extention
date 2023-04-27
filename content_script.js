@@ -6,7 +6,7 @@ let voiceSelection = null;
 let downloadButton = null;
 
 function createDownloadButton(blob) {
-  console.log('Blob:', blob); // Add this line
+  console.log('Blob:', blob); 
   if (!downloadButton) {
     downloadButton = document.createElement('a');
     downloadButton.innerHTML = 'Download TTS';
@@ -87,7 +87,7 @@ async function speakHighlightedText(e) {
           }else{
             formData.append('history_prompt', 'Unconditional');
           }
-          formData.append('history_prompt', 'Speaker 1 (en)'); // Replace with your desired prompt
+          formData.append('history_prompt', 'Speaker 1 (en)'); 
 
           const requestOptions = {
               method: 'POST',
@@ -96,7 +96,7 @@ async function speakHighlightedText(e) {
           };
           console.log("API calling", chunks);
           try {
-              const response = await fetch('https://ed37-34-90-70-61.ngrok.io/synthesize', requestOptions);
+              const response = await fetch('https://ed37-34-90-70-61.ngrok.io/synthesize', requestOptions); // replace it with your link
               const data = await response.json();
               const audioData = atob(data.audio_data);
               const audioBytes = new Uint8Array(audioData.length);
