@@ -2,28 +2,84 @@ let speakerIcon = null;
 let playButton = null;
 let audio = null;
 let voiceSelection = null;
-
+let stopPlayback = false;
+let stopButton = null;
 let downloadButton = null;
-
-function speakWithBrowserTTS(text) {
-  const utterance = new SpeechSynthesisUtterance(text);
-  speechSynthesis.speak(utterance);
+function createStopButton() {
+  if (!stopButton) {
+    stopButton = document.createElement('button');
+    stopButton.innerHTML = 'Stop TTS';
+    stopButton.style.position = 'fixed';
+    stopButton.style.zIndex = 10000;
+    stopButton.style.right = '10px';
+    stopButton.style.bottom = '10px';
+    stopButton.style.display = 'none'; // Initially hide the stop button
+    stopButton.addEventListener('click', () => {
+      if (audio) {
+        audio.pause();
+        stopPlayback = true;
+      }
+      if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+      }
+      hideStopButton(); // Hide the stop button when clicked
+    });
+    document.body.appendChild(stopButton);
+  }
 }
 
+function showStopButton() {
+  if (stopButton) {
+    stopButton.style.display = 'block';
+  }
+}
+
+function hideStopButton() {
+  if (stopButton) {
+    stopButton.style.display = 'none';
+  }
+}
+
+
+
+
+function waitForVoices() {
+  return new Promise((resolve) => {
+    const id = setInterval(() => {
+      if (speechSynthesis.getVoices().length !== 0) {
+        clearInterval(id);
+        resolve();
+      }
+    }, 10);
+  });
+}
+function createApiTtsStopButton() {
+  const stopButton = document.createElement('button');
+  stopButton.innerHTML = 'Stop API TTS';
+  stopButton.style.position = 'fixed';
+  stopButton.style.zIndex = 10000;
+  stopButton.style.right = '10px';
+  stopButton.style.bottom = '10px';
+  stopButton.addEventListener('click', () => {
+    if (audio) {
+      audio.pause();
+      stopPlayback = true;
+    }
+  });
+  document.body.appendChild(stopButton);
+}
 async function speakTextUsingBrowserTTS(text) {
+  console.log("speakTextUsingBrowserTTS called");
+  await waitForVoices(); // Add this line
   chrome.storage.local.get(['selectedVoiceBrowser'], (items) => {
     const selectedVoiceBrowser = items.selectedVoiceBrowser;
-    console.log("selectedVoiceBrowser:",selectedVoiceBrowser)
+    console.log("selectedVoiceBrowser:", selectedVoiceBrowser);
     const voice = speechSynthesis.getVoices().find((v) => v.voiceURI === selectedVoiceBrowser);
     const utterance = new SpeechSynthesisUtterance(text);
     if (voice) {
       utterance.voice = voice;
     }
-    // Wrap the speak() function inside a timeout
     speechSynthesis.speak(utterance);
-    // setTimeout(() => {
-    //   speechSynthesis.speak(utterance);
-    // }, 100);
   });
 }
 function createDownloadButton(blob) {
@@ -59,10 +115,11 @@ function showSpeakerIcon(x, y) {
     }, true);
     document.body.appendChild(speakerIcon);
   }
-  speakerIcon.style.left = (x - 32) + 'px';
-  speakerIcon.style.top = (y - 32) + 'px';
+  speakerIcon.style.left = Math.min(x - 32, window.innerWidth - 32) + 'px';
+  speakerIcon.style.top = Math.min(y - 32, window.innerHeight - 32) + 'px';
   speakerIcon.style.display = 'block';
 }
+
 
 function hideSpeakerIcon() {
   if (speakerIcon) {
@@ -71,24 +128,27 @@ function hideSpeakerIcon() {
 }
 
 async function playNextChunk(audioList) {
-  if (audioList.length > 0) {
-      const nextAudio = audioList.shift();
-      audio = new Audio(nextAudio);
-      audio.play();
-      console.log("Playing audio chunk");
-      audio.addEventListener('ended', () => {
-          console.log("Audio chunk ended");
-          playNextChunk(audioList);
-      });
+  if (audioList.length > 0 && !stopPlayback) {
+    const nextAudio = audioList.shift();
+    audio = new Audio(nextAudio);
+    audio.play();
+    console.log("Playing audio chunk");
+    audio.addEventListener('ended', () => {
+      console.log("Audio chunk ended");
+      playNextChunk(audioList);
+    });
+  } else {
+    stopPlayback = false;
   }
 }
 
 async function speakHighlightedText(e, useApi = true) {
   e.stopPropagation();
+  showStopButton();
   const fullText = window.getSelection().toString();
   // Get the selected voice from the storage
   chrome.storage.local.get(['useApi', 'selectedVoice'], async (items) => {
-  const useApi = items.useApi;
+  // const useApi = items.useApi;
   const selectedVoice = items.selectedVoice || 'Unconditional';
   console.log('Use API:', useApi);
   console.log('Selected voice:', selectedVoice);
@@ -124,7 +184,7 @@ async function speakHighlightedText(e, useApi = true) {
               };
               console.log("API calling", chunks);
               try {
-                  const response = await fetch('https://041f-34-143-165-36.ngrok.io/synthesize', requestOptions);
+                  const response = await fetch('https://4492-34-141-153-61.ngrok.io/synthesize', requestOptions);
                   const data = await response.json();
                   const audioData = atob(data.audio_data);
                   const audioBytes = new Uint8Array(audioData.length);
@@ -167,13 +227,15 @@ async function audioBufferToWaveBlob(audioBuffer) {
   const sampleRate = audioBuffer.sampleRate;
 
   const waveHeader = new ArrayBuffer(44);
-  const waveData = new Float32Array(lengthInSamples * numberOfChannels);
+  const waveData = new Int16Array(lengthInSamples * numberOfChannels);
 
   for (let channelIndex = 0; channelIndex < numberOfChannels; channelIndex++) {
     const channelData = audioBuffer.getChannelData(channelIndex);
 
     for (let i = 0; i < lengthInSamples; i++) {
-      waveData[i * numberOfChannels + channelIndex] = channelData[i];
+      const floatSample = channelData[i];
+      const intSample = Math.round(floatSample * 32767); // Convert float to 16-bit PCM
+      waveData[i * numberOfChannels + channelIndex] = intSample;
     }
   }
 
@@ -213,12 +275,12 @@ function concatAudioBuffers(audioCtx, buffers) {
   return result;
 }
 
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//   if (request.message === 'speak_text') {
-//     const e = new MouseEvent('mousedown');
-//     speakHighlightedText(e, request.useApi);
-//   }
-// });
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.message === 'speak_text') {
+    const e = new MouseEvent('mousedown');
+    speakHighlightedText(e, request.useApi);
+  }
+});
 
 
 
@@ -235,3 +297,4 @@ document.addEventListener('mousedown', () => {
   hideSpeakerIcon();
 });
 
+createStopButton();
