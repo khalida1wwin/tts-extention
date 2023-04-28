@@ -13,4 +13,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return true; // Required to use sendResponse asynchronously
     }
   });
-  
+chrome.storage.sync.get('useApi', (items) => {
+  const useApi = items.useApi;
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      message: 'speak_text',
+      useApi,
+    });
+  });
+});

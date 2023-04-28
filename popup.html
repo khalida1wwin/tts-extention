@@ -3,13 +3,71 @@
   <head>
     <title>Text-to-Speech Extension</title>
     <style>
-      /* Add any desired styling here */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+        width: 350px;
+        background-color: #f5f5f5;
+        color: #333;
+      }
+
+      h1 {
+        margin-bottom: 20px;
+        color: #4a4a4a;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      input[type='checkbox'] {
+        margin-right: 5px;
+      }
+
+      select {
+        width: 100%;
+        height: 35px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+      }
+
+      h3 {
+        margin-top: 30px;
+        margin-bottom: 10px;
+        color: #4a4a4a;
+      }
+
+      .settings-section {
+        background-color: #fff;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+      }
+
     </style>
   </head>
   <body>
     <h1>Text-to-Speech Extension</h1>
-    <label for="voiceSelection">Select Voice:</label>
-    <select id="voiceSelection"></select>
+    
+    <div class="settings-section">
+      <label for="useApi">
+        <input type="checkbox" id="useApi" name="useApi" /> Use TTS API
+      </label>
+
+      <h3>Text-to-Speech using API Voice</h3>
+      <label for="voiceSelection">Select Voice:</label>
+      <select id="voiceSelection"></select>
+    </div>
+
+    <div class="settings-section">
+      <h3>Text-to-Speech using normal voices</h3>
+      <label for="voice-selection-browser">Browser TTS Voice:</label>
+      <select id="voice-selection-browser"></select>
+    </div>
+    
     <script src="popup.js"></script>
   </body>
 </html>
