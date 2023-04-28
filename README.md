@@ -27,7 +27,7 @@ Tips:
 
 
 # This should work on all Chromium browsers:
-- tested on google chrome, and Brave 
+- tested on google chrome, Microsoft Edge, and Brave 
 - for firefox try the Firefox manifest.json after deleting the old one
 
 # Thanks to suno-ai for their amazing models:
