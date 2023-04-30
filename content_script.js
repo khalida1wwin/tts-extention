@@ -218,24 +218,23 @@ async function speakHighlightedText(e, useApi = true) {
               };
               console.log("API calling", chunks);
               try {
-                  const response = await fetch('https://4492-34-141-153-61.ngrok.io/synthesize', requestOptions);
-                  const data = await response.json();
-                  const audioData = atob(data.audio_data);
-                  const audioBytes = new Uint8Array(audioData.length);
-                  for (let i = 0; i < audioData.length; i++) {
-                      audioBytes[i] = audioData.charCodeAt(i);
-                  }
-
-                  
-                  const blob = new Blob([audioBytes.buffer], { type: "audio/wav" });
-                  const blobUrl = URL.createObjectURL(blob);
-                  audioList.push(blobUrl);
-                  // Decode the audio data and store the resulting AudioBuffer
-                  const decodedAudio = await audioCtx.decodeAudioData(audioBytes.buffer);
-                  audioBuffers.push(decodedAudio);
-              } catch (error) {
-                  console.error('Error fetching synthesized speech:', error);
-              }
+                const response = await fetch('https://165.1.76.150/synthesize', requestOptions);
+                const data = await response.json();
+                const audioData = atob(data.audio_data);
+                const audioBytes = new Uint8Array(audioData.length);
+                for (let i = 0; i < audioData.length; i++) {
+                    audioBytes[i] = audioData.charCodeAt(i);
+                }
+            
+                const blob = new Blob([audioBytes.buffer], { type: "audio/wav" });
+                const blobUrl = URL.createObjectURL(blob);
+                audioList.push(blobUrl);
+                // Decode the audio data and store the resulting AudioBuffer
+                const decodedAudio = await audioCtx.decodeAudioData(audioBytes.buffer);
+                audioBuffers.push(decodedAudio);
+            } catch (error) {
+                console.error('Error fetching synthesized speech:', error);
+            }
           }
           const fullBuffer = concatAudioBuffers(audioCtx, audioBuffers);
           // Convert the full AudioBuffer to a Blob and create the Download button
