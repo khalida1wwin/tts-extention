@@ -70,16 +70,50 @@ function createApiTtsStopButton() {
 }
 async function speakTextUsingBrowserTTS(text) {
   console.log("speakTextUsingBrowserTTS called");
-  await waitForVoices(); // Add this line
-  chrome.storage.local.get(['selectedVoiceBrowser'], (items) => {
+  await waitForVoices();
+
+  function speakChunk(utterance) {
+    return new Promise((resolve) => {
+      utterance.onend = () => {
+        resolve();
+      };
+      speechSynthesis.speak(utterance);
+    });
+  }
+
+  async function speakChunks(chunks) {
+    for (const chunk of chunks) {
+      const utterance = new SpeechSynthesisUtterance(chunk);
+      await speakChunk(utterance);
+    }
+  }
+
+  chrome.storage.local.get(['selectedVoiceBrowser'], async (items) => {
     const selectedVoiceBrowser = items.selectedVoiceBrowser;
     console.log("selectedVoiceBrowser:", selectedVoiceBrowser);
     const voice = speechSynthesis.getVoices().find((v) => v.voiceURI === selectedVoiceBrowser);
-    const utterance = new SpeechSynthesisUtterance(text);
-    if (voice) {
-      utterance.voice = voice;
+
+    // Split the text into smaller chunks (by sentences or 20 words)
+    const regex = /(?:[^.!?]+[.!?]+)|[^.!?]+$/g;
+    const chunks = text.match(regex) || [];
+
+    // Make sure each chunk has no more than 20 words
+    const finalChunks = [];
+    for (const chunk of chunks) {
+      const words = chunk.split(' ');
+      for (let i = 0; i < words.length; i += 20) {
+        finalChunks.push(words.slice(i, i + 20).join(' '));
+      }
     }
-    speechSynthesis.speak(utterance);
+
+    // Set voice for each chunk and speak
+    for (const chunk of finalChunks) {
+      const utterance = new SpeechSynthesisUtterance(chunk);
+      if (voice) {
+        utterance.voice = voice;
+      }
+      await speakChunk(utterance);
+    }
   });
 }
 function createDownloadButton(blob) {
