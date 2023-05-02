@@ -218,7 +218,7 @@ async function speakHighlightedText(e, useApi = true) {
               };
               console.log("API calling", chunks);
               try {
-                const response = await fetch('https://165.1.76.150/synthesize', requestOptions);
+                const response = await fetch('https://165.1.76.150/synthesize', requestOptions); //HERE add your API URL 
                 const data = await response.json();
                 const audioData = atob(data.audio_data);
                 const audioBytes = new Uint8Array(audioData.length);
