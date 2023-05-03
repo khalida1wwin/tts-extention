@@ -5,6 +5,9 @@ let voiceSelection = null;
 let stopPlayback = false;
 let stopButton = null;
 let downloadButton = null;
+let apiUrl = "";
+
+
 function createStopButton() {
   if (!stopButton) {
     stopButton = document.createElement('button');
@@ -189,6 +192,11 @@ async function speakHighlightedText(e, useApi = true) {
   
   if (fullText.length > 0) {
       if (useApi) {
+          // const apiUrl = //get the url form urlInput
+          if (!apiUrl) {
+            console.error('API URL not received from Google Colab');
+            return;
+          }
           // Split the text into 30-word chunks
           const words = fullText.split(' ');
           const chunks = [];
@@ -218,7 +226,7 @@ async function speakHighlightedText(e, useApi = true) {
               };
               console.log("API calling", chunks);
               try {
-                const response = await fetch('https://165.1.76.150/synthesize', requestOptions);
+                const response = await fetch(`${apiUrl}/synthesize`, requestOptions);
                 const data = await response.json();
                 const audioData = atob(data.audio_data);
                 const audioBytes = new Uint8Array(audioData.length);
@@ -309,8 +317,12 @@ function concatAudioBuffers(audioCtx, buffers) {
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.message === 'speak_text') {
-    const e = new MouseEvent('mousedown');
+  
+  if (request.type === "setApiUrl") {
+    apiUrl = request.url;
+  } 
+  if(request.message === "speak_text") {
+    const e = new MouseEvent("mousedown");
     speakHighlightedText(e, request.useApi);
   }
 });
