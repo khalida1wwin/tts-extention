@@ -1,40 +1,28 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Simple Text-to-Speech",
   "version": "1.0",
   "description": "A simple text-to-speech extension using the Web Speech API",
   "permissions": ["activeTab", "storage"],
-  "action": {
+  "browser_action": {
     "default_icon": "icon.png",
     "default_popup": "popup.html",
     "default_title": "Simple Text-to-Speech"
   },
   "background": {
-    "service_worker": "background.js"
+    "scripts": ["background.js"],
+    "persistent": false
   },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
       "js": ["content_script.js"],
       "css": ["content_script.css"],
-      "run_at": "document_idle"
+      "run_at": "document_end"
     }
   ],
-  "web_accessible_resources": [
-    {
-      "resources": ["icon.png"],
-      "matches": ["http://*/*", "https://*/*"]
-    }
-  ],
+  "web_accessible_resources": ["icon.png"],
   "icons": {
     "48": "icon.png"
   }
 }
-
-
-
-
-
-
-
-
