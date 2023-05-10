@@ -32,3 +32,9 @@ Tips:
 
 # Thanks to suno-ai for their amazing models:
 https://github.com/suno-ai/bark
+
+
+
+# TO DO:
+1. Reading speed
+2. only skim the text and give a summary and read it
