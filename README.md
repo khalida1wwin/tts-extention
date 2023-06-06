@@ -1,6 +1,10 @@
 # Disclaimer! 
 - This is an early version, and you might find few bugs!
 
+# why would you want to use this?
+1. Faster than any other tts extentions (The browser voice is almost instant)
+2. State of the art natural tts voices (bark api)
+
 # Installation 
 
 tts-extention API on Google colab (Bark_TTS_API.ipynb):
